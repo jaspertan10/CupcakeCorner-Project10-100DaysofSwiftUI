@@ -56,6 +56,14 @@ class Order: Codable {
             return false
         }
         
+        if (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        {
+            return false
+        }
+        
         return true
     }
     
