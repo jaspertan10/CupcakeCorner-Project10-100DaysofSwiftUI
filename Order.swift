@@ -7,8 +7,17 @@
 
 import SwiftUI
 
+
 @Observable
 class Order: Codable {
+    
+    struct UserAddress: Codable {
+        var name: String = ""
+        var streetAddress: String = ""
+        var city: String = ""
+        var zip: String = ""
+    }
+    
     
     enum CodingKeys: String, CodingKey {
         case _type = "type"
@@ -16,11 +25,25 @@ class Order: Codable {
         case _specialRequestEnabled = "specialRequestEnabled"
         case _extraFrosting = "extraFrosting"
         case _addSprinkles = "addSprinkles"
-        case _name = "name"
-        case _city = "city"
-        case _streetAddress = "streetAddress"
-        case _zip = "zip"
+        case _userAddress = "userAddress"
+//        case _name = "name"
+//        case _city = "city"
+//        case _streetAddress = "streetAddress"
+//        case _zip = "zip"
     }
+    
+    init() {
+        if let savedAddress = UserDefaults.standard.data(forKey: "userAddress") {
+            if let decoded = try? JSONDecoder().decode(UserAddress.self, from: savedAddress) {
+                userAddress = decoded
+                return
+            }
+        }
+        
+        userAddress = UserAddress()
+    }
+    
+    
     
     /* Cupcake types & selection*/
     static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
@@ -43,23 +66,30 @@ class Order: Codable {
     var addSprinkles = false
     
     
-    // Address properties
-    var name = ""
-    var streetAddress = ""
-    var city = ""
-    var zip = ""
     
+    
+    
+    
+    // Address properties
+    var userAddress: UserAddress {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(userAddress) {
+                UserDefaults.standard.set(encoded, forKey: "userAddress")
+            }
+        }
+    }
+
     
     // Determines if address is valid
     var hasValidAddress: Bool {
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
+        if userAddress.name.isEmpty || userAddress.streetAddress.isEmpty || userAddress.city.isEmpty || userAddress.zip.isEmpty {
             return false
         }
         
-        if (name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-            name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-            city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-            zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        if (userAddress.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            userAddress.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            userAddress.city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            userAddress.zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         {
             return false
         }
