@@ -11,8 +11,14 @@ struct CheckoutView: View {
     
     var order: Order
     
+    //Alert for place order confirmation
     @State private var confirmationMessage = ""
     @State private var showingConfirmation = false
+    
+    //Alert for place order failure
+    @State private var errorMessage = ""
+    @State private var showError = false
+    
     
     var body: some View {
         ScrollView {
@@ -44,6 +50,11 @@ struct CheckoutView: View {
         } message: {
             Text(confirmationMessage)
         }
+        .alert("Error!", isPresented: $showError) {
+            Button("OK") {}
+        } message: {
+            Text(errorMessage)
+        }
         .scrollBounceBehavior(.basedOnSize)
     }
     
@@ -66,6 +77,8 @@ struct CheckoutView: View {
             confirmationMessage = "Your order for \(decodedOrder.quantity) x \(Order.types[decodedOrder.type].lowercased()) cupcakes is on its way!"
             showingConfirmation = true
             } catch {
+                errorMessage = "Checkout failed: \(error.localizedDescription)"
+                showError = true
                 print("Checkout failed: \(error.localizedDescription)")
         }
     }
